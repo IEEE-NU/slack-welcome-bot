@@ -1,4 +1,4 @@
-// Load environment variables from `.env` file (optional)
+// Load environment variables from .env file
 require('dotenv').config();
 
 const slackEventsApi = require('@slack/events-api');
@@ -14,23 +14,9 @@ const slackEvents = slackEventsApi.createSlackEventAdapter(process.env.SLACK_VER
   includeBody: true
 });
 
-// Initialize a data structures to store team authorization info (typically stored in a database)
-const botAuthorizations = {}
-
-// Helpers to cache and lookup appropriate client
-// NOTE: Not enterprise-ready. if the event was triggered inside a shared channel, this lookup
-// could fail but there might be a suitable client from one of the other teams that is within that
-// shared channel.
-const clients = {};
-function getClientByTeamId(teamId) {
-  if (!clients[teamId] && botAuthorizations[teamId]) {
-    clients[teamId] = new SlackClient(botAuthorizations[teamId]);
-  }
-  if (clients[teamId]) {
-    return clients[teamId];
-  }
-  return null;
-}
+// We're only using this on one Slack team
+let slackClient;
+let accessToken;
 
 // Initialize Add to Slack (OAuth) helpers
 passport.use(new SlackStrategy({
@@ -39,7 +25,8 @@ passport.use(new SlackStrategy({
   skipUserProfile: true,
 }, (accessToken, scopes, team, extra, profiles, done) => {
   console.log(`authorized on team ${team.id}`);
-  botAuthorizations[team.id] = extra.bot.accessToken;
+  accessToken = extra.bot.accessToken;
+  slackClient = new SlackClient(accessToken);
   done(null, {});
 }));
 
@@ -72,30 +59,29 @@ app.use('/slack/events', slackEvents.expressMiddleware());
 slackEvents.on('message', (message, body) => {
   if (message.subtype) return;
   console.log(`receive message ${message.text}`);
-  sendWelcomeMessage(message.user, body.team_id);
+  sendWelcomeMessage(message.user);
 });
 
 slackEvents.on('team_join', (event, body) => {
   console.log("new user");
-  sendWelcomeMessage(event.user.id, body.team_id);
+  sendWelcomeMessage(event.user.id);
 });
 
-function sendWelcomeMessage(user_id, team_id) {
+function sendWelcomeMessage(user_id) {
   console.log(`Sending welcome message to ${user_id}`);
   // Initialize a client
-  const slack = getClientByTeamId(team_id);
   // Handle initialization failure
-  if (!slack) {
+  if (!slackClient) {
     return console.error('No authorization found for this team. Did you install this app again after restarting?');
   }
   // Lookup or open a new direct message channel to the user
-  slack.dm.open(user_id, (err, res) => {
+  slackClient.dm.open(user_id, (err, res) => {
     if (err) {
       console.log("Error finding user to send welcome message");
       return;
     }
     // Send them a nice message!
-    slack.chat.postMessage(res.channel.id, `Hello <@${user_id}>! :tada:`)
+    slackClient.chat.postMessage(res.channel.id, `Hello <@${user_id}>! :tada:`)
       .catch(console.error);
   });
 }
