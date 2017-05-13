@@ -9,14 +9,39 @@ const http = require('http');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-// *** Initialize event adapter using verification token from environment variables ***
-const slackEvents = slackEventsApi.createSlackEventAdapter(process.env.SLACK_VERIFICATION_TOKEN, {
-  includeBody: true
+const firebase = require("firebase");
+const fbConfig = require("./firebaseconfig");
+// User IDs who are allowed to change messages
+let admins = require("./admins");
+// Text of messages to send users
+let messages = require("./messages");
+
+// Only using this bot on one Slack team, so only need to track one Slack client
+let slackClient;
+
+// Initialize firebase
+firebase.initializeApp(fbConfig.config);
+
+// Authenticate with firebase
+firebase.auth().signInWithEmailAndPassword(fbConfig.email, fbConfig.password).catch(error => {
+  console.log(`Firebase: auth error ${error.code}: ${error.message}`);
+}).then(() => {
+  console.log("Firebase: Logged in!");
+  // Watch for changes to messages
+  firebase.database().ref('/messages').on('value', snapshot => {
+    console.log("Firebase: messages updated");
+    messages = Object.assign(messages, snapshot.val());
+  });
+  // Watch for changes to admins
+  firebase.database().ref('/admins').on('value', snapshot => {
+    console.log("Firebase: admins updated");
+    admins = Object.assign(admins, snapshot.val());
+  });
 });
 
-// We're only using this on one Slack team
-let slackClient;
-let accessToken;
+// Initialize an Express application
+const app = express();
+app.use(bodyParser.json());
 
 // Initialize Add to Slack (OAuth) helpers
 passport.use(new SlackStrategy({
@@ -25,14 +50,9 @@ passport.use(new SlackStrategy({
   skipUserProfile: true,
 }, (accessToken, scopes, team, extra, profiles, done) => {
   console.log(`authorized on team ${team.id}`);
-  accessToken = extra.bot.accessToken;
-  slackClient = new SlackClient(accessToken);
+  slackClient = new SlackClient(extra.bot.accessToken);
   done(null, {});
 }));
-
-// Initialize an Express application
-const app = express();
-app.use(bodyParser.json());
 
 // Plug the Add to Slack (OAuth) helpers into the express app
 app.use(passport.initialize());
@@ -45,7 +65,7 @@ app.get('/auth/slack', passport.authenticate('slack', {
 app.get('/auth/slack/callback',
   passport.authenticate('slack', { session: false }),
   (req, res) => {
-    console.log(`installed on team`);
+    console.log(`WelcomeBot installed`);
     res.send('<p>WelcomeBot was successfully installed on your team.</p>');
   },
   (err, req, res, next) => {
@@ -53,22 +73,55 @@ app.get('/auth/slack/callback',
   }
 );
 
-// *** Plug the event adapter into the express app as middleware ***
+// *** Initialize event adapter using verification token from environment variables ***
+const slackEvents = slackEventsApi.createSlackEventAdapter(process.env.SLACK_VERIFICATION_TOKEN);
 app.use('/slack/events', slackEvents.expressMiddleware());
 
-slackEvents.on('message', (message, body) => {
-  if (message.subtype) return;
-  console.log(`receive message ${message.text}`);
-  sendWelcomeMessage(message.user);
+slackEvents.on('message', event => {
+  if (event.subtype) return;
+  console.log(`receive message ${event.text}`);
+  // Not a command, send welcome message
+  if (event.text[0] !== "!") {
+    sendMessage(event.user, messages.welcome);
+    return;
+  }
+
+  // Not authorized for a command
+  if (!admins.hasOwnProperty(event.user)) {
+    console.log("Unauthorized command");
+    sendMessage(event.user, messages.unauthorized_admin);
+    return;
+  }
+
+  let splitText = event.text.split(" ");
+  const command = splitText.shift().substring(1);
+  if (command === "set" || command === "update") {
+    const path = splitText.shift();
+    if (path.match(/\.\$\[]#/i)) {
+      sendMessage(event.user, messages.invalid_path);
+      return;
+    }
+
+    let data;
+    try {
+      data = JSON.parse(splitText.join(" "));
+    } catch (error) {
+      // JSON parse failed, probably
+      sendMessage(event.user, messages.invalid_data);
+      return;
+    }
+    firebase.database().ref(path)[command](data);
+    sendMessage(event.user, `${path} ${command}: ${JSON.stringify(data)}`);
+  }
 });
 
-slackEvents.on('team_join', (event, body) => {
+slackEvents.on('team_join', event => {
   console.log("new user");
-  sendWelcomeMessage(event.user.id);
+  sendMessage(event.user.id, messages.welcome);
 });
 
-function sendWelcomeMessage(user_id) {
-  console.log(`Sending welcome message to ${user_id}`);
+function sendMessage(user_id, message) {
+  console.log(`Sending message to ${user_id}`);
   // Initialize a client
   // Handle initialization failure
   if (!slackClient) {
@@ -77,12 +130,11 @@ function sendWelcomeMessage(user_id) {
   // Lookup or open a new direct message channel to the user
   slackClient.dm.open(user_id, (err, res) => {
     if (err) {
-      console.log("Error finding user to send welcome message");
+      console.log("Error finding user to send message");
       return;
     }
     // Send them a nice message!
-    slackClient.chat.postMessage(res.channel.id, `Hello <@${user_id}>! :tada:`)
-      .catch(console.error);
+    slackClient.chat.postMessage(res.channel.id, message).catch(console.error);
   });
 }
 
