@@ -119,7 +119,7 @@ slackEvents.on('message', event => {
     firebase.database().ref(path)[command](data);
     sendMessage(event.user, `${path} ${command}: ${JSON.stringify(data)}`);
   } else if (command === "get") {
-    sendMessage(event.user, `messages: ${JSON.stringify(messages)}`);
+    sendMessage(event.user, `messages: ${JSON.stringify(messages, null, 2)}`);
   } else {
     sendMessage(event.user, messages.unknown_command);
   }
