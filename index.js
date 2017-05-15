@@ -118,6 +118,10 @@ slackEvents.on('message', event => {
     }
     firebase.database().ref(path)[command](data);
     sendMessage(event.user, `${path} ${command}: ${JSON.stringify(data)}`);
+  } else if (command === "set_welcome") {
+    let data = splitText.join(" ");
+    firebase.database().ref("messages").update({ welcome: data });
+    sendMessage(event.user, `set welcome message to: ${data}`);
   } else if (command === "get") {
     sendMessage(event.user, `messages: ${JSON.stringify(messages, null, 2)}`);
   } else {
