@@ -10,7 +10,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const firebase = require("firebase");
-const fbConfig = require("./firebaseconfig");
 // User IDs who are allowed to change messages
 let admins = require("./admins");
 // Text of messages to send users
@@ -20,10 +19,17 @@ let messages = require("./messages");
 let slackClient;
 
 // Initialize firebase
-firebase.initializeApp(fbConfig.config);
+firebase.initializeApp({
+  apiKey: "AIzaSyA2TxWYA6G9afrM_Xk2743KGj7LYG1ymH4",
+  authDomain: "ieee-slack.firebaseapp.com",
+  databaseURL: "https://ieee-slack.firebaseio.com",
+  projectId: "ieee-slack",
+  storageBucket: "ieee-slack.appspot.com",
+  messagingSenderId: "503109759610"
+});
 
 // Authenticate with firebase
-firebase.auth().signInWithEmailAndPassword(fbConfig.email, fbConfig.password).catch(error => {
+firebase.auth().signInWithEmailAndPassword(process.env.FIREBASE_EMAIL, process.env.FIREBASE_PASSWORD).catch(error => {
   console.log(`Firebase: auth error ${error.code}: ${error.message}`);
 }).then(() => {
   console.log("Firebase: Logged in!");
