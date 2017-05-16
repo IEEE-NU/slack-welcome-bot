@@ -96,6 +96,7 @@ slackEvents.on('message', event => {
 
   if (event.text in triggers) {
     sendMessage(event.user, messages[triggers[event.text]]);
+    return;
   }
 
   sendMessage(event.user, messages.unknown_trigger);
