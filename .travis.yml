@@ -4,6 +4,6 @@ deploy:
   provider: heroku
   api_key:
     secure: e9fM8Q2BNdvtmCV26tL9C6pZY/88ozRuHLwWq80meqzBbeESR6rEZOSD+2n2bSAg63fZx4/QP2TO0dT/VjnVD4CJi/FLWbm2py2Fnr42IeakAQzhSwWH8T4JWzQKASWuuOv04YwENlvCyWsv8z/e4gGO6sjjKSjPoBL1lsfszIjFIlFhd+iep98N4ER/RkXNUazH6WSyp4UdsnggReyppvGOti6OjxcJccUNv3OY3/CTY4nQK2vcTG9xgx4gUH/BC0SL6084rOucm1fu5SOwXEnZw28qQwhOGPSQ8Ngi6Gd+UkCHqDrf1wtBOu6VU36Nnz/v0vs0WbZla2BeoP1YMJywvQD8Ag/AVtAC9n55SQIW+UbKDtVkOyRjymq6Hvii8NNIrnnt5q0fiSz0b/iqJW3mZoDddvROKRprDfLO9RZRKAYRMNEo8gZFztDx3ajPNYKR1mNPM48UGPoEetimc+Bznsayx9skAEY9y7jnbDDHVIk9Sefy4tm4ZefbWB1bMpmP0bdh2PgdiwLcK7dKgGDnJ/a69KzRVgMbzIUaz3uHxouXD+A+gJZLw2OX88ZWvb01/KFO0v9WwaSjHIXWDyRzi8dvuR27XT2OKExj5ErAg7p9EkrZNlhxqMY01MNbAvhaJqOgYbQBI+QKKYgY+BwJuNpIlJUxcBs3zeC8FJs=
-  app: slack-welcome-bot
+  app: ieee-welcome-bot
   on:
     repo: IEEE-NU/slack-welcome-bot
