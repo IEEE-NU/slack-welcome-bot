@@ -14,6 +14,7 @@ const firebase = require("firebase");
 let admins = require("./admins");
 // Text of messages to send users
 let messages = require("./messages");
+let triggers = require("./triggers").inverted();
 
 // Only using this bot on one Slack team, so only need to track one Slack client
 let slackClient;
@@ -84,14 +85,23 @@ const slackEvents = slackEventsApi.createSlackEventAdapter(process.env.SLACK_VER
 app.use('/slack/events', slackEvents.expressMiddleware());
 
 slackEvents.on('message', event => {
+  // Only respond to direct messages sent to us, not our own messages
   if (event.subtype) return;
   console.log(`receive message ${event.text}`);
-  // Not a command, send welcome message
-  if (event.text[0] !== "!") {
-    sendMessage(event.user, messages.welcome);
+  if (event.text[0] === "!") {
+    // Admin command
+    processCommand(event);
     return;
   }
 
+  if (event.text in triggers) {
+    sendMessage(event.user, messages[triggers[event.text]]);
+  }
+
+  sendMessage(event.user, messages.unknown_trigger);
+});
+
+function processCommand(event) {
   // Not authorized for a command
   if (!admins.hasOwnProperty(event.user)) {
     console.log("Unauthorized command");
@@ -127,7 +137,7 @@ slackEvents.on('message', event => {
   } else {
     sendMessage(event.user, messages.unknown_command);
   }
-});
+}
 
 slackEvents.on('team_join', event => {
   console.log("new user");
