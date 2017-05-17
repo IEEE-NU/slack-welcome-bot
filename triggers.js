@@ -1,7 +1,8 @@
 let triggers = {
     welcome: ["welcome message"],
     hello: ["hello", "hi", "hey", "sup"],
-    code_location: ["show me your code", "code"]
+    code_location: ["show me your code", "code"],
+    help: ["help", "wat"]
 }
 
 // Invert the triggers
