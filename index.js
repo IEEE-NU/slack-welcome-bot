@@ -94,9 +94,11 @@ slackEvents.on('message', event => {
     return;
   }
 
-  let msgLower = event.text.toLowerCase();
-  if (msgLower in triggers) {
-    sendMessage(event.user, messages[triggers[msgLower]]);
+  let parsedTrigger = event.text
+    .toLowerCase()
+    .replace(/[^\w\s]|_/g, "");;
+  if (parsedTrigger in triggers) {
+    sendMessage(event.user, messages[triggers[parsedTrigger]]);
     return;
   }
 
@@ -112,9 +114,13 @@ function processCommand(event) {
   }
 
   let splitText = event.text.split(" ");
-  const command = splitText.shift().substring(1).toLowerCase();
+  const command = splitText.shift()
+    .substring(1)
+    .toLowerCase()
+    .replace(/[^\w\s]|_/g, "");
   if (command === "set" || command === "update") {
     const path = splitText.shift();
+    // Make sure the path is a valid Firebase path
     if (path.match(/\.\$\[]#/i)) {
       sendMessage(event.user, messages.invalid_path);
       return;
