@@ -7,8 +7,7 @@
   "author": "paep3nguin",
   "license": "MIT",
   "scripts": {
-    "start": "node index.js",
-    "test": ""
+    "start": "node index.js"
   },
   "dependencies": {
     "@aoberoi/passport-slack": "^1.0.5",
