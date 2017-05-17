@@ -5,8 +5,10 @@ let messages = {
         "You can use the #general channel to discuss whatever you want, CS-related or not.",
         "We recommend using <meetfranz.com|Franz> or the <slack.com/get|official Slack client> so you can have this Slack open without taking up a precious browser tab. " +
         "Franz even lets you have Messenger, GroupMe, WhatsApp, and many other chat services in one handy client.",
-        "To see what else I respond to, message back \"help\""].join('\n\n'),
+        "If you've never use Slack before, reply *intro* for a quick overview. To see what else I respond to, message back *help*"].join('\n\n'),
+    intro: "Slack is a messaging client for organizations. You can chat in channels, which are chat rooms dedicated to a topic (like #memes), or directly message people or groups of people.",
     help: ["I respond to the following commands:",
+        "*intro*: I'll give you an overview of Slack",
         "*code*: get a link to my source code",
         "*hello, hi, or hey*: I'll say hello back :)",
         "*welcome message*: replay the original welcome message",
