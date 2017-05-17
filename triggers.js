@@ -3,7 +3,7 @@
 let triggers = {
     intro: ["intro", "introduction"],
     welcome: ["welcome message"],
-    hello: ["hello", "hi", "hey", "sup"],
+    hello: ["hello", "hi", "hey", "hola", "sup"],
     code_location: ["show me your code", "code"],
     help: ["help", "wat"]
 }
