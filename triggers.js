@@ -1,6 +1,7 @@
 module.exports = {
     welcome: ["welcome message"],
     hello: ["hello", "hi", "hey", "sup"],
+    code_location: ["show me your code"],
     inverted: function () {
         // Invert the triggers
         let inverse = {};
