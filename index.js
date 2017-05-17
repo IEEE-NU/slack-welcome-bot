@@ -159,7 +159,7 @@ function sendMessage(user_id, message) {
       return;
     }
     // Send them a nice message!
-    slackClient.chat.postMessage(res.channel.id, message).catch(console.error);
+    slackClient.chat.postMessage(res.channel.id, message, { link_names: 1 }).catch(console.error);
   });
 }
 
