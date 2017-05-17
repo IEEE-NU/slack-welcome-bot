@@ -2,6 +2,9 @@
 
 A Slack bot to welcome new users to our Slack team. [Join us on Slack!](https://ieee-nu.slack.com/signup)
 
+## Usage
+This bot automatically messages new users when they join the IEEE Slack team. Send @welcomebot a friendly "hello" or "help"!
+
 ## Setting up for development
 Message @willx to be added as a collaborator and for super secret API keys and stuff.
 
