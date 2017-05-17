@@ -7,7 +7,8 @@
   "author": "paep3nguin",
   "license": "MIT",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "prod": "git push heroku master && opn https://ieee-welcome-bot.herokuapp.com/"
   },
   "dependencies": {
     "@aoberoi/passport-slack": "^1.0.5",
@@ -18,5 +19,8 @@
     "express": "^4.14.1",
     "firebase": "^3.9.0",
     "passport": "^0.3.2"
+  },
+  "devDependencies": {
+    "opn-cli": "^3.1.0"
   }
 }
