@@ -94,8 +94,9 @@ slackEvents.on('message', event => {
     return;
   }
 
-  if (event.text in triggers) {
-    sendMessage(event.user, messages[triggers[event.text]]);
+  let msgLower = event.text.toLowerCase();
+  if (msgLower in triggers) {
+    sendMessage(event.user, messages[triggers[msgLower]]);
     return;
   }
 
@@ -111,7 +112,7 @@ function processCommand(event) {
   }
 
   let splitText = event.text.split(" ");
-  const command = splitText.shift().substring(1);
+  const command = splitText.shift().substring(1).toLowerCase();
   if (command === "set" || command === "update") {
     const path = splitText.shift();
     if (path.match(/\.\$\[]#/i)) {
