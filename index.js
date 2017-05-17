@@ -14,7 +14,7 @@ const firebase = require("firebase");
 let admins = require("./admins");
 // Text of messages to send users
 let messages = require("./messages");
-let triggers = require("./triggers").inverted();
+let triggers = require("./triggers");
 
 // Only using this bot on one Slack team, so only need to track one Slack client
 let slackClient;

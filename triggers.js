@@ -1,19 +1,15 @@
-module.exports = {
+let triggers = {
     welcome: ["welcome message"],
     hello: ["hello", "hi", "hey", "sup"],
-    code_location: ["show me your code"],
-    inverted: function () {
-        // Invert the triggers
-        let inverse = {};
-        for (const key in this) {
-            if (key === "inverted") {
-                continue;
-            }
+    code_location: ["show me your code", "code"]
+}
 
-            for (let i = 0, l = this[key].length; i < l; i++) {
-                inverse[this[key][i]] = key;
-            }
-        }
-        return inverse;
+// Invert the triggers
+let inverse = {};
+for (const key in triggers) {
+    for (let i = 0, l = triggers[key].length; i < l; i++) {
+        inverse[triggers[key][i]] = key;
     }
 }
+
+module.exports = inverse;
