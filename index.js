@@ -85,13 +85,13 @@ const slackEvents = slackEventsApi.createSlackEventAdapter(process.env.SLACK_VER
 app.use('/slack/events', slackEvents.expressMiddleware());
 
 slackEvents.on('message', event => {
-  console.log(`receive message ${event.text}`);
   // Only respond to direct messages sent to us, not our own messages
   if (event.subtype) return;
   slackClient.dm.open(event.user, (err, res) => {
     // Only respond to messages sent directly to us, not to other users
     // Our bot can listen to all direct messages
     if (res.channel.id !== event.channel) return;
+    console.log(`receive message ${event.text}`);
 
     if (event.text[0] === "!") {
       // Admin command
