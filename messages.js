@@ -9,7 +9,7 @@ let messages = {
     intro: ["Slack is a messaging client for organizations. You can chat in channels, which are chat rooms dedicated to a topic (like #memes), or directly message people or groups of people.",
         "Slack now has threads, which let you reply directly to a message for in-depth discussion and not clog the channel.",
         "If you would like a channel to be created, start a discussion in #general and if there's enough interest, we'll make it!",
-        "For more info, read <https://get.slack.help/hc/en-us/articles/115004071768|What is Slack?>."].join('\n\n'),
+        "For more info, read <https://get.slack.help/hc/en-us/articles/115004071768|What is Slack?>"].join('\n\n'),
     help: ["I respond to the following commands:",
         "*intro*: I'll give you an overview of Slack",
         "*code*: get a link to my source code",
